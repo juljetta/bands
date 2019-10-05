@@ -9,7 +9,7 @@ var session = require("express-session");
 var MongoStore = require("connect-mongo")(session);
 
 mongoose
-  .connect("mongodb://localhost:27017/authen", { useNewUrlParser: true })
+  .connect("mongodb://localhost:27017/bands", { useNewUrlParser: true })
   .then(() => {
     console.log("Connected!");
   })

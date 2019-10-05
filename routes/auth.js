@@ -13,6 +13,15 @@ router.post("/signup", function(req, res, next) {
   var password = req.body.password;
   var salt = bcrypt.genSaltSync(bcryptSalt);
   var hashPass = bcrypt.hashSync(password, salt);
+  var confirmPassword = req.body.confirm_password;
+  var surname = req.body.surname;
+
+  if (password !== confirmPassword) {
+    res.render("signup", {
+      errorMessage: "Password doesn't match"
+    });
+    return;
+  }
   if (username === "" || password === "") {
     res.render("signup", {
       errorMessage: "Indicate a username and a password to sign up"
@@ -30,6 +39,7 @@ router.post("/signup", function(req, res, next) {
 
     User.create({
       username,
+      surname,
       password: hashPass
     })
       .then(() => {

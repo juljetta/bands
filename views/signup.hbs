@@ -1,9 +1,26 @@
-<form action="/auth/signup" method="post" id="form">
-  <input type="text" placeholder="Name" name="username">
-  <input type="password" placeholder="Password" name="password">
-  <button type=" submit"> Sign up</button>
-</form>
+<div class="split signup-hero">
+  <img src="/images/joey-thompson-4zN_-PKsbWw-unsplash.jpg" alt="">
+</div>
 
-{{#if errorMessage}}
-{{errorMessage}}
-{{/if}}
+<div class="split signup-form">
+  <div class="centered">
+    <h2>Sign up</h2>
+    {{#if errorMessage}}
+    <div style="color:red">{{errorMessage}}</div>
+    {{/if}}
+    <form action="/auth/signup" method="post" id="form">
+      <input type="text" placeholder="Name" name="username">
+      <br>
+      <input type="text" placeholder="Surname" name="surname">
+      <br>
+      <input type="password" placeholder="Password" name="password">
+      <br>
+      <input type="password" placeholder="Confirm password" name="confirm_password">
+      <br>
+      <button type="submit"> Sign up</button>
+    </form>
+    <p class="account-message">
+      Already have an account? <a href="/auth/signup">Login</a>
+    </p>
+  </div>
+</div>
