@@ -1,6 +1,44 @@
-<ul id="container">
-  <li><a href="/auth/signup">Sign up</a></li>
-  <li> <a href="/auth/login">Login</a></li>
-  <li><a href="/main"> Main (requires authentication!)</a></li>
-  <li><a href="/private"> Private (requires authentication!)</a></li>
-</ul>
+<div class="main-container">
+  <form action="search">
+
+    <div class="input label city">
+      <label for="city">I'm in</label>
+      <input class="search-input" type="text" placeholder="Where do you start your trip?" name="city">
+    </div>
+
+    <div class="input label artist">
+      <label for="artist">I want to follow</label>
+      <input id="id-artist" class="search-input" type="text" placeholder="Who is the artist you love?" name="artist"
+        value="Aurora">
+    </div>
+
+  </form>
+
+  <button id="btn-search-events">Search Events
+  </button>
+
+  <div class="artist-container">
+    <div>
+      <h2 id="artist-name"></h2>
+    </div>
+    <div>
+      <img id="img-artist-small" src="" alt="">
+    </div>
+
+  </div>
+  <div class="route-container" id="route-container">
+    <div class="starting-point">
+      <p> Amsterdam </p>
+    </div>
+
+    <div class="empty-point">
+      <p></p>
+    </div>
+  </div>
+
+
+  <div>
+    <div id="event-container">
+    </div>
+  </div>
+</div>
