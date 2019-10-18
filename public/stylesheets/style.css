@@ -9,6 +9,10 @@ body {
   font-family: "Roboto", sans-serif;
 }
 
+/* p {
+  margin: 5px;
+} */
+
 a {
   color: #00b7ff;
 }
@@ -173,44 +177,58 @@ button {
 }
 .starting-point {
   width: 150px;
-  border: solid 3px white;
-  height: 50px;
+  /* border: solid 3px white; */
+  /* height: 50px; */
   text-align: center;
   font-family: "Roboto" sans-serif;
   font-size: 16px;
   margin-top: 20px;
+  margin-bottom: 20px;
   background-color: #2cb4ab;
   color: White;
   margin-right: 20px;
+
+  border-radius: 3px;
 }
 
 .route-point {
   width: 150px;
   border: solid 3px #2cb4ab;
   border-radius: 3px;
-  height: 50px;
+  /* height: 50px; */
   text-align: center;
   font-family: "Roboto" sans-serif;
   font-size: 14px;
   margin-top: 20px;
+  margin-bottom: 20px;
   color: #2cb4ab;
   margin-right: 20px;
+  box-sizing: border-box;
+}
+
+.route-point p {
+  margin: 5px;
 }
 
 .empty-point {
   width: 150px;
   border: dashed 3px #2cb4ab;
   border-radius: 3px;
-  height: 50px;
+  /* height: 50px; */
   text-align: center;
   font-family: "Roboto" sans-serif;
   font-size: 16px;
   margin-top: 20px;
-  color: #2cb4ab;
+  margin-bottom: 20px;
+  color: rgb(182, 182, 182);
+  margin-right: 20px;
+  box-sizing: border-box;
 }
 
 .route-container {
   display: flex;
+  justify-items: center;
+  align-items: center;
 }
 
 .pressed-button {
@@ -224,3 +242,11 @@ button {
   margin-bottom: 50px;
   font-family: "Space Mono", monospace;
 }
+
+#btn-create-route {
+  margin-bottom: 0px;
+  /* margin-top: 20px; */
+  background-color: #ff7400;
+}
+
+/* #btn-create-route: disabled; */
