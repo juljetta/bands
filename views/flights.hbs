@@ -1,0 +1,16 @@
+<div class="flights-container">
+  <div id="price">
+  </div>
+  <div id="from">
+    <p></p>
+  </div>
+  <div id="to">
+    <p></p>
+  </div>
+
+  <div id="card-venue-city">
+    <p>${response.data[i].venue.city}, ${response.data[i].venue.country}</p>
+  </div>
+  <button data-id="${i}" data-datetime="${response.data[i].datetime}" data-lat="${response.data[i].venue.latitude}"
+    data-lon="${response.data[i].venue.longitude}" type="button" class="btn-add-to-route">Add to Route</button>
+</div>

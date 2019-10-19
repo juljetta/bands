@@ -4,13 +4,8 @@ window.onload = async function() {
   var goButton = document.getElementById("btn-create-route");
   const appId = "9e02c7a9ef14339e99edc2d7c86dda17";
 
-  var selectedLocations = [
-    {
-      id: -1,
-      airport: "AMS",
-      date: "2019-10-17T19:00:00"
-    }
-  ];
+  var selectedLocations = [];
+  var homeAirport = "AMS";
 
   function findAirport(lat, lon) {
     return axios
@@ -19,6 +14,42 @@ window.onload = async function() {
       )
       .then(response => {
         return response.data.locations[0].id;
+      });
+  }
+  function findFlight(from, to) {
+    return axios
+      .get(
+        `https://api.skypicker.com/flights?flyFrom=${from.airport}&to=${
+          to.airport
+        }&dateFrom=${convertDatetoKiwi(from.date)}&dateTo=${convertDatetoKiwi(
+          to.date
+        )}&partner=picky&limit=1`
+      )
+      .then(response => {
+        var data = response.data.data;
+        if (data.length > 0) {
+          var result = {
+            price: data[0].price,
+            place: to,
+            route: []
+          };
+          for (let i = 0; i < data[0].route.length; i++) {
+            const route = data[0].route[i];
+            result.route.push({
+              cityFrom: route.cityFrom,
+              cityTo: route.cityTo,
+              flightNo: route.flight_no,
+              airline: route.airline
+            });
+          }
+          return result;
+        } else {
+          console.log(`No flight found from ${from.airport} to ${to.airport}`);
+          return {
+            place: to,
+            price: false
+          };
+        }
       });
   }
 
@@ -37,7 +68,6 @@ window.onload = async function() {
         artistName.innerHTML = response.data.name;
         artistImage.src = response.data.thumb_url;
       })
-
       .catch(err => {
         console.log(err);
       });
@@ -45,12 +75,13 @@ window.onload = async function() {
 
   function searchEvents() {
     var artist = artistField.value;
+
     axios
       .get(
         `https://rest.bandsintown.com/artists/${artist}/events?app_id=${appId}`
       )
       .then(response => {
-        console.log("events", response.data);
+        // console.log("events", response.data);
 
         var eventContainer = document.getElementById("event-container");
         $(eventContainer).empty();
@@ -84,8 +115,9 @@ window.onload = async function() {
         addButtons.click(function() {
           var clickedButton = $(this);
           var parent = $(this).parent();
-          var eventDate = parent.find("#card-date")[0].innerText;
+          var eventDate = parent.find("#card-date")[0].innerHTML;
           var eventCity = parent.find("#card-venue-city")[0].innerText;
+          var eventVenue = parent.find("#card-venue-name")[0].innerText;
           var routeContainer = $("#route-container");
           const id = clickedButton.data("id");
           const lat = clickedButton.data("lat");
@@ -136,7 +168,10 @@ window.onload = async function() {
             selectedLocations.push({
               airport: airportCode,
               date: orignalDate,
-              id: id
+              id: id,
+              eventDate: eventDate,
+              eventCity: eventCity,
+              eventVenue: eventVenue
             });
           });
 
@@ -158,7 +193,108 @@ window.onload = async function() {
   };
 
   function createRoute() {
-    console.log(selectedLocations);
+    var eventContainer = document.getElementById("event-container");
+    $(eventContainer).empty();
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+          <div class= "card-container">
+            <h2>Searching...</h2>
+          </div>
+          `;
+    // console.log(card);
+
+    eventContainer.appendChild(card);
+    // console.log(selectedLocations);
+
+    // 1. create pairs of selected`locations
+    var pairs = [];
+    for (let i = 0; i <= selectedLocations.length; i++) {
+      let to, from;
+      if (i == 0) {
+        // flying from home (first flight)
+        from = {
+          airport: homeAirport,
+          date: new Date().toISOString()
+        };
+      } else {
+        from = selectedLocations[i - 1];
+      }
+
+      if (i == selectedLocations.length) {
+        // flying back home (last flight)
+        to = {
+          airport: homeAirport,
+          date: from.date,
+          eventCity: false
+        };
+      } else {
+        to = selectedLocations[i];
+      }
+
+      pairs.push({ from: from, to: to });
+    }
+
+    // 2. for each pair findFlight
+    var flightsPromises = [];
+    pairs.forEach(pair => {
+      flightsPromises.push(findFlight(pair.from, pair.to));
+    });
+
+    //3. wait for all flights to be ready
+    Promise.all(flightsPromises).then(results => {
+      console.log(results);
+
+      var eventContainer = document.getElementById("event-container");
+      $(eventContainer).empty();
+
+      for (let index = 0; index < results.length; index++) {
+        const flight = results[index];
+
+        const route = document.createElement("div");
+
+        if (flight.price == false) {
+          route.innerHTML = `<h2>There is no flights to ${flight.place.eventCity}. Take a bus or train.</h2>`;
+        } else {
+          var list = document.createElement("ul");
+          for (let i = 0; i < flight.route.length; i++) {
+            const f = flight.route[i];
+            var li = document.createElement("li");
+            li.innerHTML = `${f.airline}${f.flightNo} ${f.cityFrom} - ${f.cityTo}`;
+            list.appendChild(li);
+          }
+          route.appendChild(list);
+          var price = document.createElement("h2");
+          price.innerHTML = `EUR ${flight.price}`;
+          route.appendChild(price);
+        }
+        eventContainer.appendChild(route);
+
+        if (flight.place.eventCity == false) {
+          // flying home, no next place card
+          continue;
+        }
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+         <div class= "card-container">
+            <div id="card-date">
+             <p> ${flight.place.eventDate}</p>
+              </div>
+            <div id = "card-venue-name">
+              <p>${flight.place.eventVenue}</p>
+            </div>
+           
+            <div id = "card-venue-city">
+            <p>${flight.place.eventCity}</p>
+            </div>
+          </div>
+          `;
+        // console.log(card);
+
+        eventContainer.appendChild(card);
+      }
+    });
   }
 
   goButton.onclick = createRoute;
@@ -171,6 +307,22 @@ function convertDate(dateOfEvent) {
   const monthNumber = date.getMonth();
   const monthName = monthToName(monthNumber);
   return `<p>${day} <br> ${monthName}</p>`;
+}
+
+function convertDatetoKiwi(dateOfEvent) {
+  const date = new Date(dateOfEvent);
+  var dd = date.getDate();
+  var mm = date.getMonth() + 1; //January is 0!
+
+  var yyyy = date.getFullYear();
+  if (dd < 10) {
+    dd = "0" + dd;
+  }
+  if (mm < 10) {
+    mm = "0" + mm;
+  }
+  var dateFormatted = dd + "/" + mm + "/" + yyyy;
+  return dateFormatted;
 }
 
 function monthToName(monthNumber) {
